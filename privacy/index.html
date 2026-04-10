@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Privacy Policy â PropSize</title>
+<title>Privacy Policy · PropSize</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, system-ui, sans-serif; font-size: 16px; line-height: 1.7; color: #1a1a1a; background: #fff; padding: 48px 24px; max-width: 720px; margin: 0 auto; }
@@ -16,7 +16,7 @@
 </head>
 <body>
 <h1>Privacy Policy</h1>
-<p class="meta">PropSize · Last updated: 9 April 2026</p>
+<p class="meta">PropSize · Last updated: 10 April 2026</p>
 
 <p>PropSize is a position size calculator for prop traders. This policy explains what data we collect, how we use it, and your rights under applicable law including the EU General Data Protection Regulation (GDPR) and UK GDPR.</p>
 
@@ -25,25 +25,33 @@
 
 <h2>2. What data we collect</h2>
 <p>PropSize is designed to work with minimal data collection.</p>
+
 <p><strong>Data stored locally on your device only:</strong> Your firm selection, account size, risk preferences, instrument settings, and contract size overrides are stored using AsyncStorage on your device. This data never leaves your device and is not accessible to us.</p>
+
 <p><strong>Subscription data (RevenueCat):</strong> When you purchase a subscription or start a free trial, RevenueCat processes your payment through Apple. RevenueCat stores an anonymous subscriber identifier linked to your Apple ID to manage your subscription status. We do not have access to your payment card details. RevenueCat's privacy policy is available at revenuecat.com/privacy.</p>
+
+<p><strong>Analytics (PostHog):</strong> We use PostHog to collect anonymous usage data to understand how the app is used and improve the product. All events are anonymous — no personal identifiers, names, email addresses, or financial data are ever sent. Events we track include: onboarding completion, calculation performed, paywall shown, trial started, and purchase completed. PostHog data is stored on EU servers (Frankfurt). PostHog's privacy policy is available at posthog.com/privacy.</p>
+
+<p><strong>Crash reporting (Sentry):</strong> We use Sentry to collect anonymous crash reports when the app encounters an error. Crash reports contain technical information about the error and device type but do not contain personal data, financial data, or any information you have entered into the app. Sentry data is stored on EU servers (Frankfurt). Sentry's privacy policy is available at sentry.io/privacy.</p>
+
 <p><strong>Push notifications:</strong> If you grant permission, we may send you push notifications about your trial status. Your device token is used by Expo to deliver notifications and is not shared with third parties.</p>
+
 <p><strong>Exchange rate data:</strong> On app open, PropSize fetches current exchange rates from frankfurter.app to ensure accurate calculations. No personal data is sent in this request.</p>
 
 <h2>3. What data we do not collect</h2>
-<p>We do not collect your name, email address, trading history, or any personally identifiable information. We do not use analytics tools, crash reporting services, or advertising networks. We do not track your behaviour within the app.</p>
+<p>We do not collect your name, email address, trading history, account balance, or any personally identifiable information. We do not use advertising networks or sell data to third parties.</p>
 
 <h2>4. Legal basis for processing (GDPR)</h2>
-<p>For subscription management, we process data on the basis of contract performance — specifically, to provide you with the subscription service you have purchased. For push notifications, we process data on the basis of your explicit consent, which you may withdraw at any time in your device settings.</p>
+<p>For subscription management, we process data on the basis of contract performance — specifically, to provide you with the subscription service you have purchased. For anonymous analytics and crash reporting, we process data on the basis of our legitimate interests in improving the app. For push notifications, we process data on the basis of your explicit consent, which you may withdraw at any time in your device settings.</p>
 
 <h2>5. Data retention</h2>
-<p>Local device data is retained until you delete the app or clear app data. Subscription data held by RevenueCat is subject to their retention policies. Push notification tokens are retained until you withdraw permission or delete the app.</p>
+<p>Local device data is retained until you delete the app or clear app data. Subscription data held by RevenueCat is subject to their retention policies. Anonymous analytics data is retained by PostHog for 1 year. Crash report data is retained by Sentry for 90 days. Push notification tokens are retained until you withdraw permission or delete the app.</p>
 
 <h2>6. Your rights</h2>
 <p>Under GDPR and UK GDPR, you have the right to access, rectify, or erase personal data we hold about you. You also have the right to object to processing and to data portability where applicable. To exercise any of these rights, contact us at hello@propsize.app. As we hold minimal personal data, most requests can be fulfilled by deleting the app from your device.</p>
 
 <h2>7. International transfers</h2>
-<p>RevenueCat is a US-based service. Data transferred to RevenueCat is subject to standard contractual clauses or other appropriate safeguards under GDPR.</p>
+<p>RevenueCat is a US-based service. Data transferred to RevenueCat is subject to standard contractual clauses or other appropriate safeguards under GDPR. PostHog and Sentry data is stored in the EU and does not require international transfer.</p>
 
 <h2>8. Children</h2>
 <p>PropSize is not directed at children under 13. We do not knowingly collect data from children.</p>
