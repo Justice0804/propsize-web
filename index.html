@@ -3,239 +3,1443 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PropSize — Prop-firm-aware position sizing</title>
-<meta name="description" content="The only position size calculator that knows your prop firm's rules. Never blow a challenge on a sizing mistake.">
+<title>PropSize — Prop Firm Position Size Calculator</title>
+<meta name="description" content="The only position size calculator that knows your prop firm's rules. FTMO, FundedNext, FundingPips — never blow a challenge on a sizing mistake.">
+<meta property="og:title" content="PropSize — Size every trade. Protect every account.">
+<meta property="og:description" content="The only position size calculator that knows your prop firm's rules. Never blow a challenge on a sizing mistake.">
+<meta property="og:image" content="https://propsize.app/hero.png">
+<meta property="og:url" content="https://propsize.app">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="PropSize — Size every trade. Protect every account.">
+<meta name="twitter:description" content="The only position size calculator that knows your prop firm's rules.">
+<meta name="twitter:image" content="https://propsize.app/hero.png">
+<link rel="canonical" href="https://propsize.app">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  body {
-    background: #000;
-    color: #fff;
-    font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 60px 24px;
+:root {
+  --bg: #0A0A0A;
+  --surface: #111111;
+  --surface-el: #1A1A1A;
+  --amber: #E8A838;
+  --text: #FFFFFF;
+  --subtext: rgba(255,255,255,0.65);
+  --border: rgba(255,255,255,0.08);
+  --radius-card: 16px;
+  --radius-btn: 24px;
+  --font-body: 'Poppins', -apple-system, system-ui, sans-serif;
+  --font-hero: 'Poppins', sans-serif;
+  --font-cta: 'Barlow Condensed', sans-serif;
+}
+
+html, body {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page-wrapper {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+
+/* ── Focus states — keyboard accessibility ── */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Skip to content — keyboard nav ── */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 16px;
+  background: var(--amber);
+  color: #000;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: var(--radius-btn);
+  z-index: 200;
+  transition: top 0.2s;
+}
+
+.skip-link:focus {
+  top: 12px;
+}
+
+/* ── Reveal class — hidden by default, Motion will animate ── */
+.reveal { opacity: 0; }
+
+/* ── Reduced motion: show everything, no animation ── */
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1 !important; transform: none !important; }
+}
+
+/* ── NAV ── */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: rgba(10,10,10,0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.logo-mark {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-wordmark {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: rgba(255,255,255,0.7);
+}
+
+.nav-links {
+  display: flex;
+  gap: 32px;
+  list-style: none;
+}
+
+.nav-links a {
+  font-size: 14px;
+  color: var(--subtext);
+  transition: color 0.2s;
+  cursor: pointer;
+}
+
+.nav-links a:hover { color: var(--text); }
+
+.nav-cta {
+  display: inline-flex;
+  align-items: center;
+  background: var(--amber);
+  color: #000;
+  font-family: var(--font-cta);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: opacity 0.2s, transform 0.15s;
+  cursor: pointer;
+  min-height: 36px;
+}
+
+.nav-cta:hover { opacity: 0.88; }
+.nav-cta:active { transform: scale(0.97); }
+
+/* Mobile hamburger */
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+}
+
+.hamburger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--subtext);
+  margin: 5px 0;
+  transition: 0.3s;
+}
+
+.mobile-menu {
+  display: none;
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  background: rgba(10,10,10,0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 24px;
+  z-index: 99;
+}
+
+.mobile-menu.open { display: block; }
+
+.mobile-menu a {
+  display: block;
+  font-size: 16px;
+  color: var(--subtext);
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+}
+
+.mobile-menu a:last-child { border-bottom: none; }
+
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .hamburger { display: flex; }
+}
+
+/* ── SECTION LAYOUT ── */
+section { padding: 80px 24px; }
+
+.container {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.container-wide {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ── HERO — Two column ── */
+.hero {
+  padding-top: 164px;
+  padding-bottom: 80px;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 55fr 45fr;
+  gap: 48px;
+  align-items: center;
+}
+
+.hero-left h1 {
+  font-family: var(--font-hero);
+  font-size: 52px;
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+
+.hero-left .subline {
+  font-size: 17px;
+  color: var(--subtext);
+  max-width: 420px;
+  line-height: 1.6;
+  margin-top: 16px;
+}
+
+.app-store-badge {
+  display: inline-block;
+  margin-top: 32px;
+  transition: opacity 0.2s, transform 0.15s;
+  cursor: pointer;
+}
+
+.app-store-badge img {
+  height: 44px;
+  width: auto;
+}
+
+.app-store-badge:hover { opacity: 0.85; }
+.app-store-badge:active { transform: scale(0.97); }
+
+.hero-caption {
+  font-size: 12px;
+  color: var(--subtext);
+  margin-top: 10px;
+}
+
+.hero-right {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.hero-right img {
+  width: 100%;
+  max-width: 340px;
+  height: auto;
+  border-radius: 20px;
+  filter: drop-shadow(0 0 60px rgba(232,168,56,0.12));
+}
+
+@media (max-width: 768px) {
+  .hero { padding-top: 124px; padding-bottom: 60px; }
+  .hero-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    text-align: center;
   }
+  .hero-left h1 { font-size: 36px; }
+  .hero-left .subline { max-width: 100%; margin-left: auto; margin-right: auto; }
+  .app-store-badge { margin-left: auto; margin-right: auto; }
+  .app-store-badge img { height: 40px; }
+  .hero-caption { text-align: center; }
+  .hero-right { justify-content: center; }
+  .hero-right img { max-width: 280px; }
+}
 
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 56px;
+/* ── HOW IT WORKS ── */
+.how-it-works { background: var(--bg); }
+
+.section-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 48px;
+}
+
+.hiw-grid {
+  display: grid;
+  grid-template-columns: 45fr 55fr;
+  gap: 56px;
+  align-items: center;
+}
+
+.hiw-phone {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.hiw-phone img {
+  width: 100%;
+  max-width: 360px;
+  height: auto;
+  border-radius: 20px;
+  filter: drop-shadow(0 0 60px rgba(232,168,56,0.12));
+}
+
+.hiw-steps { display: flex; flex-direction: column; }
+
+.hiw-step {
+  position: relative;
+  padding: 32px 0;
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.hiw-step:first-child { padding-top: 0; }
+.hiw-step:last-child { border-bottom: none; padding-bottom: 0; }
+
+.hiw-step h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.hiw-step p {
+  font-size: 15px;
+  color: var(--subtext);
+  line-height: 1.55;
+  max-width: 400px;
+}
+
+.hiw-step-num {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-hero);
+  font-size: 64px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.06);
+  line-height: 1;
+  pointer-events: none;
+}
+
+.hiw-step:first-child .hiw-step-num { top: 32px; transform: none; }
+.hiw-step:last-child .hiw-step-num { top: auto; bottom: 0; transform: none; }
+
+@media (max-width: 768px) {
+  .hiw-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
   }
+  .hiw-phone { max-width: 280px; margin: 0 auto; }
+  .hiw-step-num { font-size: 48px; }
+}
 
-  .logo-mark {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    background: #111;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+/* ── TESTIMONIAL ── */
+.testimonial { background: var(--bg); }
 
-  .wordmark {
-    font-size: 18px;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    color: rgba(255,255,255,0.6);
-  }
+.testimonial-card {
+  padding: 0;
+}
 
-  /* ── Two-column layout ── */
-  .main {
-    display: flex;
-    align-items: center;
-    gap: 64px;
-    max-width: 960px;
-    width: 100%;
-    margin-bottom: 64px;
-  }
+.testimonial-quote-icon {
+  color: var(--amber);
+  opacity: 0.3;
+  margin-bottom: 16px;
+}
 
-  .left {
-    flex: 1;
-    min-width: 0;
-  }
+.testimonial-card blockquote {
+  font-size: 18px;
+  line-height: 1.65;
+  color: rgba(255,255,255,0.9);
+  font-style: normal;
+  font-weight: 500;
+  margin-bottom: 24px;
+}
 
-  h1 {
-    font-size: clamp(32px, 4.5vw, 52px);
-    font-weight: 700;
-    line-height: 1.1;
-    letter-spacing: -0.03em;
-    margin-bottom: 20px;
-  }
+.testimonial-attribution {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 
-  h1 span { color: #E8A838; }
+.testimonial-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--amber);
+  flex-shrink: 0;
+}
 
-  .subtext {
-    font-size: 17px;
-    line-height: 1.6;
-    color: rgba(255,255,255,0.5);
-    margin-bottom: 32px;
-  }
+.testimonial-info cite {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  font-style: normal;
+  display: block;
+}
 
-  .badges {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 36px;
-  }
+.testimonial-info span {
+  font-size: 13px;
+  color: var(--subtext);
+}
 
-  .badge {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 20px;
-    padding: 6px 14px;
-    font-size: 13px;
-    color: rgba(255,255,255,0.5);
-  }
+/* ── FEATURES ── */
+.features { background: var(--bg); }
 
-  .badge.amber {
-    background: rgba(232,168,56,0.1);
-    border-color: rgba(232,168,56,0.3);
-    color: #E8A838;
-  }
+.feature-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px 56px;
+}
 
-  .cta {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: #fff;
-    color: #000;
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    padding: 14px 28px;
-    border-radius: 50px;
-    text-decoration: none;
-    transition: opacity 0.2s;
-  }
+.feature-item {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
 
-  .cta:hover { opacity: 0.85; }
+.feature-icon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  color: var(--amber);
+  margin-top: 2px;
+}
 
-  /* ── Phone mockup ── */
-  .right {
-    flex-shrink: 0;
-  }
+.feature-item h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
 
-  .phone {
-    width: 260px;
-    background: #1a1a1a;
-    border-radius: 44px;
-    border: 1.5px solid rgba(255,255,255,0.12);
-    padding: 10px;
-    box-shadow:
-      0 0 0 1px rgba(0,0,0,0.5),
-      0 40px 80px rgba(0,0,0,0.6),
-      0 0 60px rgba(232,168,56,0.06);
-  }
+.feature-item p {
+  font-size: 14px;
+  color: var(--subtext);
+  line-height: 1.55;
+}
 
-  .phone img {
-    width: 100%;
-    border-radius: 36px;
-    display: block;
-  }
+@media (max-width: 768px) {
+  .feature-grid { grid-template-columns: 1fr; gap: 32px; }
+}
 
-  /* ── Firms ── */
-  .firms {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-bottom: 48px;
-  }
+/* ── TRUST STRIP ── */
+.trust-strip {
+  padding: 48px 24px;
+  text-align: center;
+}
 
-  .firm {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 8px;
-    padding: 6px 12px;
-    font-size: 12px;
-    color: rgba(255,255,255,0.35);
-    letter-spacing: 0.05em;
-  }
+.trust-label {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  margin-bottom: 28px;
+}
 
-  footer {
-    display: flex;
-    gap: 24px;
-    font-size: 13px;
-  }
+.trust-firms {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 48px;
+  flex-wrap: wrap;
+}
 
-  footer a {
-    color: rgba(255,255,255,0.3);
-    text-decoration: none;
-  }
+.trust-firms img {
+  height: 28px;
+  width: auto;
+  opacity: 0.7;
+  transition: opacity 0.3s;
+}
 
-  footer a:hover { color: rgba(255,255,255,0.6); }
+.trust-firms img:hover {
+  opacity: 1;
+}
 
-  /* ── Responsive ── */
-  @media (max-width: 680px) {
-    .main {
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-    }
-    .badges { justify-content: center; }
-    .left { order: 2; }
-    .right { order: 1; }
-    .phone { width: 220px; }
-  }
+/* ── FOUNDER NOTE ── */
+.founder { background: var(--bg); }
+
+.founder-card {
+  padding: 0;
+  text-align: center;
+}
+
+.founder-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--surface-el);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--amber);
+}
+
+.founder-card blockquote {
+  font-size: 16px;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.8);
+  margin-bottom: 20px;
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.founder-card cite {
+  font-size: 14px;
+  color: var(--subtext);
+  font-style: normal;
+}
+
+/* ── SOCIAL ── */
+.social-proof {
+  background: var(--bg);
+  text-align: center;
+}
+
+.social-proof h2 {
+  font-family: var(--font-hero);
+  font-size: 32px;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+}
+
+.social-proof .subline {
+  color: var(--subtext);
+  font-size: 15px;
+  margin-bottom: 32px;
+}
+
+.social-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.social-card {
+  background: var(--surface);
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border);
+  padding: 24px;
+  text-align: center;
+  transition: border-color 0.25s;
+  cursor: pointer;
+}
+
+.social-card:hover { border-color: rgba(255,255,255,0.15); }
+
+.social-icon { font-size: 24px; margin-bottom: 12px; }
+
+.social-card .platform {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--subtext);
+  margin-bottom: 4px;
+}
+
+.social-card .handle {
+  font-size: 14px;
+  color: var(--amber);
+}
+
+@media (max-width: 768px) {
+  .social-grid { grid-template-columns: 1fr; }
+}
+
+/* ── SHARE CARD ── */
+.share-card-section {
+  background: var(--bg);
+  text-align: center;
+}
+
+.share-card-section h2 {
+  font-family: var(--font-hero);
+  font-size: 36px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-bottom: 16px;
+}
+
+.share-card-section .subline {
+  font-size: 17px;
+  color: var(--subtext);
+  max-width: 480px;
+  margin: 0 auto 40px;
+  line-height: 1.6;
+}
+
+.share-card-img {
+  display: flex;
+  justify-content: center;
+}
+
+.share-card-img img {
+  max-width: 300px;
+  max-height: 580px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 60px rgba(232,168,56,0.12));
+}
+
+@media (max-width: 768px) {
+  .share-card-section h2 { font-size: 28px; }
+  .share-card-img img { max-width: 240px; max-height: 460px; }
+}
+
+/* ── PRICING PREVIEW ── */
+.pricing-preview { background: var(--bg); }
+
+.pricing-preview-card {
+  padding: 0;
+  text-align: center;
+}
+
+.pricing-preview-card h2 {
+  font-family: var(--font-hero);
+  font-size: 28px;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+
+.pricing-preview-card .subline {
+  color: var(--subtext);
+  font-size: 15px;
+  margin-bottom: 36px;
+}
+
+.price-options {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 36px;
+  flex-wrap: wrap;
+}
+
+.price-option {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 28px 32px;
+  min-width: 220px;
+  position: relative;
+  transition: border-color 0.3s;
+}
+
+.price-option.featured {
+  border-color: rgba(232,168,56,0.3);
+}
+
+.price-badge {
+  position: absolute;
+  top: -10px;
+  right: 16px;
+  background: var(--amber);
+  color: #000;
+  font-family: var(--font-cta);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 10px;
+}
+
+.price-option .period {
+  font-size: 13px;
+  color: var(--subtext);
+  margin-bottom: 4px;
+}
+
+.price-option .amount {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.price-option .amount span {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--subtext);
+}
+
+.price-option .trial {
+  font-size: 12px;
+  color: var(--subtext);
+}
+
+.pricing-link {
+  display: inline-block;
+  font-size: 14px;
+  color: var(--amber);
+  margin-top: 16px;
+  transition: opacity 0.2s;
+  cursor: pointer;
+}
+
+.pricing-link:hover { opacity: 0.7; }
+
+/* ── FAQ ── */
+.faq { background: var(--bg); }
+
+.faq h2 {
+  font-family: var(--font-hero);
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--border);
+}
+
+.faq-item:last-child { border-bottom: none; }
+
+.faq-question {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0;
+  cursor: pointer;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  color: var(--text);
+  font-size: 17px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  min-height: 44px;
+  gap: 16px;
+}
+
+.faq-question:hover { color: rgba(255,255,255,0.85); }
+
+.faq-chevron {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  color: var(--amber);
+  transition: transform 0.3s ease;
+}
+
+.faq-item.open .faq-chevron {
+  transform: rotate(90deg);
+}
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  opacity: 0;
+}
+
+.faq-item.open .faq-answer {
+  max-height: 300px;
+  opacity: 1;
+}
+
+.faq-answer p {
+  font-size: 15px;
+  color: var(--subtext);
+  line-height: 1.6;
+  padding-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+  .faq h2 { font-size: 26px; }
+  .faq-question { font-size: 16px; }
+}
+
+/* ── FOOTER ── */
+.footer {
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 48px 24px;
+}
+
+.footer-inner {
+  max-width: 680px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.footer-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.footer-logo .logo-mark {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+}
+
+.footer-logo .nav-wordmark { font-size: 15px; }
+
+.footer-nav {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.footer-nav a {
+  font-size: 14px;
+  color: var(--subtext);
+  transition: color 0.2s;
+  cursor: pointer;
+}
+
+.footer-nav a:hover { color: var(--text); }
+
+.footer-legal {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.footer-legal a {
+  font-size: 12px;
+  color: rgba(255,255,255,0.3);
+  transition: color 0.2s;
+  cursor: pointer;
+}
+
+.footer-legal a:hover { color: var(--subtext); }
+
+.footer-copy {
+  font-size: 12px;
+  color: rgba(255,255,255,0.25);
+  margin-bottom: 16px;
+}
+
+.footer-social {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.footer-social a {
+  color: var(--subtext);
+  transition: color 0.2s;
+  cursor: pointer;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer-social a:hover { color: var(--text); }
 </style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How do I calculate lot size for an FTMO challenge?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "After setup, just enter your stop loss and tap Calculate. Your firm, balance, and risk % are already pre-filled from your last session. PropSize applies FTMO's 5% daily loss limit automatically. Your lot size is ready in two taps."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does PropSize handle gold (XAUUSD) position sizing?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Gold requires a specific contract size that varies by broker — most web calculators get this wrong. PropSize walks you through finding the exact contract size in your MT5 platform, saves it, and uses it for every calculation after that. You only do this once."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does PropSize enforce the daily loss limit?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. FTMO's 5% daily loss limit, FundedNext's 5%, and FundingPips' 4% are all pre-loaded. An amber warning appears when your position approaches 80% of the limit — giving you time to size down before it becomes a violation."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I use PropSize for multiple prop firm accounts?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Switch between firms and account sizes in seconds. PropSize pre-fills from your last session — no manual setup every time you open the app."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does PropSize work without an internet connection?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. PropSize works fully offline. No live price feeds, no loading screens. It opens ready to calculate — useful when you're mid-session and need a number fast."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is PropSize accurate?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "For forex pairs the math is exact. For gold (XAUUSD) and indices, PropSize guides you to find your broker's exact contract size in MT5, saves it, and uses it for every calculation. For cross pairs, approximate FX rates are used, accurate to within 1-2%."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is there a free version?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No free tier — PropSize uses a free trial model instead. Monthly plan gets 3 days, annual gets 7 days. Full access during the trial. Card required upfront."
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body>
 
-<div class="logo">
-  <div class="logo-mark">
-    <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
-      <rect x="4" y="4" width="5" height="24" rx="1.5" fill="white"/>
-      <circle cx="20" cy="14" r="10" fill="white"/>
-      <rect x="14" y="17" width="3.5" height="7" rx="1" fill="#000"/>
-      <rect x="18.5" y="13.5" width="3.5" height="10.5" rx="1" fill="#000"/>
-      <rect x="23" y="10" width="3.5" height="14" rx="1" fill="#E8A838"/>
-    </svg>
+<div class="page-wrapper">
+
+<!-- ═══════ NAV ═══════ -->
+<a href="#main" class="skip-link">Skip to content</a>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo" aria-label="PropSize home">
+      <div class="logo-mark">
+        <svg width="20" height="20" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <rect x="4" y="4" width="5" height="24" rx="1.5" fill="white"/>
+          <circle cx="20" cy="14" r="10" fill="white"/>
+          <rect x="14" y="17" width="3.5" height="7" rx="1" fill="#000"/>
+          <rect x="18.5" y="13.5" width="3.5" height="10.5" rx="1" fill="#000"/>
+          <rect x="23" y="10" width="3.5" height="14" rx="1" fill="#E8A838"/>
+        </svg>
+      </div>
+      <span class="nav-wordmark">PropSize</span>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="#pricing">Pricing</a></li>
+    </ul>
+
+    <a href="https://apps.apple.com/app/propsize/id6761734569" class="nav-cta">Download</a>
+
+    <button class="hamburger" onclick="document.querySelector('.mobile-menu').classList.toggle('open')" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
   </div>
-  <span class="wordmark">PropSize</span>
+</nav>
+
+<div class="mobile-menu" role="navigation" aria-label="Mobile menu">
+  <a href="#pricing" onclick="this.parentElement.classList.remove('open')">Pricing</a>
+  <a href="https://apps.apple.com/app/propsize/id6761734569" onclick="this.parentElement.classList.remove('open')">Download</a>
 </div>
 
-<div class="main">
-  <div class="left">
-    <h1>Size every trade.<br><span>Protect every account.</span></h1>
-    <p class="subtext">The only position size calculator that knows your prop firm's rules. Never blow a challenge on a sizing mistake.</p>
+<!-- ═══════ HERO ═══════ -->
+<main id="main">
+<section class="hero">
+  <div class="container-wide">
+    <div class="hero-grid">
+      <div class="hero-left">
+        <h1 class="reveal" id="hero-headline">Size every trade.<br>Protect every account.</h1>
+        <p class="subline reveal" id="hero-subline">The only calculator built for prop traders. Knows your firm's rules. No ads, no manual setup, no scrolling — pre-filled and ready before your entry fires.</p>
 
-    <div class="badges">
-      <span class="badge amber">Prop-firm aware</span>
-      <span class="badge">Works offline</span>
-      <span class="badge">Voice input</span>
-      <span class="badge">Gold &amp; indices</span>
+        <a href="https://apps.apple.com/app/propsize/id6761734569" class="app-store-badge reveal" id="hero-cta">
+          <img src="/assets/images/app-store-badge.svg" alt="Download on the App Store" height="44">
+        </a>
+        <p class="hero-caption reveal" id="hero-caption">Free 7-day trial</p>
+      </div>
+
+      <div class="hero-right reveal" id="hero-right">
+        <img src="/assets/images/14.png" alt="PropSize app — position size calculator showing trade setup" width="1284" height="2778" loading="eager" sizes="(max-width: 768px) 280px, 340px">
+      </div>
     </div>
+  </div>
+</section>
 
-    <a class="cta" href="https://apps.apple.com/app/propsize/id6761737354">
-      Download on the App Store
+<!-- ═══════ TRUST STRIP ═══════ -->
+<section class="trust-strip reveal">
+  <p class="trust-label">Trusted by traders on</p>
+  <div class="trust-firms">
+    <img src="/assets/logos/ftmo.svg" alt="FTMO" height="24" loading="lazy">
+    <img src="/assets/logos/fundednext.svg" alt="FundedNext" height="24" loading="lazy">
+    <img src="/assets/logos/fundingpips.svg" alt="FundingPips" height="24" loading="lazy">
+  </div>
+</section>
+
+<!-- ═══════ HOW IT WORKS ═══════ -->
+<section class="how-it-works">
+  <div class="container-wide">
+    <p class="section-label reveal">How it works</p>
+
+    <div class="hiw-grid">
+      <div class="hiw-phone reveal">
+        <img src="/assets/images/15.png" alt="PropSize lot size result screen" width="1284" height="2778" loading="lazy" sizes="(max-width: 768px) 280px, 360px">
+      </div>
+
+      <div class="hiw-steps">
+        <div class="hiw-step reveal">
+          <h3>Select your firm</h3>
+          <p>FTMO, FundedNext, FundingPips — your daily loss limit loads automatically.</p>
+          <span class="hiw-step-num">01</span>
+        </div>
+
+        <div class="hiw-step reveal">
+          <h3>Enter your trade</h3>
+          <p>Balance, risk %, instrument, stop loss. Pre-filled from your last session.</p>
+          <span class="hiw-step-num">02</span>
+        </div>
+
+        <div class="hiw-step reveal">
+          <h3>Get your lot size</h3>
+          <p>Calculated in real time. Copy it. Trade it.</p>
+          <span class="hiw-step-num">03</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ FEATURES ═══════ -->
+<section class="features">
+  <div class="container">
+    <p class="section-label reveal">Also built in</p>
+
+    <div class="feature-grid">
+      <div class="feature-item reveal">
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        <div>
+          <h3>Voice input</h3>
+          <p>Say your trade out loud. Instrument, entry, stop loss, risk. Fields fill automatically.</p>
+        </div>
+      </div>
+      <div class="feature-item reveal">
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+        <div>
+          <h3>Works offline</h3>
+          <p>No live prices needed. Opens ready to calculate. No loading, no waiting.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ SHARE CARD ═══════ -->
+<section class="share-card-section">
+  <div class="container">
+    <h2 class="reveal">Every calculation. Shareable in one tap.</h2>
+    <p class="subline reveal">Branded trade card showing your position, risk, lot size and firm. Share directly to X in one tap.</p>
+    <div class="share-card-img reveal">
+      <img src="/assets/images/16.png" alt="PropSize shareable trade card" width="1284" height="2778" loading="lazy">
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ TESTIMONIAL ═══════ -->
+<section class="testimonial">
+  <div class="container">
+    <div class="testimonial-card reveal">
+      <svg class="testimonial-quote-icon" width="32" height="32" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.583 17.321C3.553 16.227 3 15 3 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311C9.591 11.69 11.14 13.166 11.14 15a3.5 3.5 0 0 1-3.5 3.5c-1.073 0-2.099-.49-3.057-1.179zM14.583 17.321C13.553 16.227 13 15 13 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311 1.986.178 3.535 1.654 3.535 3.489a3.5 3.5 0 0 1-3.5 3.5c-1.073 0-2.099-.49-3.057-1.179z"/></svg>
+      <blockquote>The app UX is great and it took 2 taps to get my lot size, switch between accounts and sizes — for me that trades multiple accounts, super easy. Compared to the web calculator I was using, it takes ages to scroll to find the pair I'm trading, I still have to manually type in my account size every time which was a pain. Not to talk of the ads that I had to dismiss like 2 or 3 of them. This actually just saved me from missing my entry.</blockquote>
+      <div class="testimonial-attribution">
+        <div class="testimonial-avatar">BT</div>
+        <div class="testimonial-info">
+          <cite>Beta tester</cite>
+          <span>Multi-account prop trader</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ PRICING ═══════ -->
+<section class="pricing-preview" id="pricing">
+  <div class="container">
+    <div class="pricing-preview-card reveal">
+      <h2>Start free. Cancel anytime.</h2>
+      <p class="subline">Full access during your trial.</p>
+
+      <div class="price-options">
+        <div class="price-option">
+          <p class="period">Monthly</p>
+          <p class="amount">$8.99<span>/mo</span></p>
+          <p class="trial">3-day free trial</p>
+        </div>
+        <div class="price-option featured">
+          <div class="price-badge">Save 44%</div>
+          <p class="period">Annual</p>
+          <p class="amount">$59.99<span>/yr</span></p>
+          <p class="trial">7-day free trial</p>
+        </div>
+      </div>
+
+      <a href="https://apps.apple.com/app/propsize/id6761734569" class="app-store-badge" style="margin-top: 0">
+        <img src="/assets/images/app-store-badge.svg" alt="Download on the App Store" height="44">
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ FAQ ═══════ -->
+<section class="faq">
+  <div class="container">
+    <h2 class="reveal">Frequently asked questions</h2>
+
+    <div class="faq-list reveal">
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          How do I calculate lot size for an FTMO challenge?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <div class="faq-answer"><p>After setup, just enter your stop loss and tap Calculate. Your firm, balance, and risk % are already pre-filled from your last session. PropSize applies FTMO's 5% daily loss limit automatically. Your lot size is ready in two taps.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          How does PropSize handle gold (XAUUSD) position sizing?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <div class="faq-answer"><p>Gold requires a specific contract size that varies by broker — most web calculators get this wrong. PropSize walks you through finding the exact contract size in your MT5 platform, saves it, and uses it for every calculation after that. You only do this once.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          Does PropSize enforce the daily loss limit?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <div class="faq-answer"><p>Yes. FTMO's 5% daily loss limit, FundedNext's 5%, and FundingPips' 4% are all pre-loaded. An amber warning appears when your position approaches 80% of the limit — giving you time to size down before it becomes a violation.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          Can I use PropSize for multiple prop firm accounts?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <div class="faq-answer"><p>Switch between firms and account sizes in seconds. PropSize pre-fills from your last session — no manual setup every time you open the app.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          Does PropSize work without an internet connection?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <div class="faq-answer"><p>Yes. PropSize works fully offline. No live price feeds, no loading screens. It opens ready to calculate — useful when you're mid-session and need a number fast.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          Is PropSize accurate?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <div class="faq-answer"><p>For forex pairs the math is exact. For gold (XAUUSD) and indices, PropSize guides you to find your broker's exact contract size in MT5, saves it, and uses it for every calculation. For cross pairs, approximate FX rates are used, accurate to within 1-2%.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          Is there a free version?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <div class="faq-answer"><p>No free tier — PropSize uses a free trial model instead. Monthly plan gets 3 days, annual gets 7 days. Full access during the trial. Card required upfront.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ CLOSING CTA ═══════ -->
+<section class="closing-cta">
+  <div class="container" style="text-align: center;">
+    <h2 class="reveal" style="font-family: var(--font-hero); font-size: 32px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 12px;">Start sizing trades the right way.</h2>
+    <p class="reveal" style="color: var(--subtext); font-size: 15px; margin-bottom: 28px;">Free 7-day trial. Cancel anytime.</p>
+    <a href="https://apps.apple.com/app/propsize/id6761734569" class="app-store-badge reveal" style="margin-top: 0">
+      <img src="/assets/images/app-store-badge.svg" alt="Download on the App Store" height="44">
     </a>
   </div>
+</section>
 
-  <div class="right">
-    <div class="phone">
-      <img src="/hero.png" alt="PropSize app screenshot">
+<!-- ═══════ FOUNDER NOTE ═══════ -->
+<section class="founder">
+  <div class="container">
+    <div class="founder-card reveal">
+      <div class="founder-avatar">J</div>
+      <blockquote>"I built PropSize after nearly blowing an FTMO challenge on a gold lot size mistake. I was using a web calculator that didn't know my daily loss limit, didn't handle XAUUSD contract sizes, and showed me ads while I was trying to enter a trade. PropSize fixes all of that."</blockquote>
+      <cite>— Justice, PropSize developer · <a href="https://x.com/justice_note" target="_blank" rel="noopener" style="color: var(--amber)">@justice_note</a></cite>
     </div>
   </div>
-</div>
+</section>
 
-<div class="firms">
-  <span class="firm">FTMO</span>
-  <span class="firm">FundedNext</span>
-  <span class="firm">FundingPips</span>
-  <span class="firm">Live Account</span>
-</div>
+</main>
 
-<footer>
-  <a href="/privacy">Privacy Policy</a>
-  <a href="/terms">Terms of Use</a>
-  <a href="mailto:hello@propsize.app">Contact</a>
+<!-- ═══════ FOOTER ═══════ -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-logo">
+      <div class="logo-mark">
+        <svg width="16" height="16" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <rect x="4" y="4" width="5" height="24" rx="1.5" fill="white"/>
+          <circle cx="20" cy="14" r="10" fill="white"/>
+          <rect x="14" y="17" width="3.5" height="7" rx="1" fill="#000"/>
+          <rect x="18.5" y="13.5" width="3.5" height="10.5" rx="1" fill="#000"/>
+          <rect x="23" y="10" width="3.5" height="14" rx="1" fill="#E8A838"/>
+        </svg>
+      </div>
+      <span class="nav-wordmark">PropSize</span>
+    </div>
+
+    <div class="footer-nav">
+      <a href="#pricing">Pricing</a>
+      <a href="mailto:hello@propsize.app">Contact</a>
+    </div>
+
+    <div class="footer-legal">
+      <a href="/privacy">Privacy Policy</a>
+      <a href="/terms">Terms of Use</a>
+    </div>
+
+    <p class="footer-copy">&copy; 2026 PropSize</p>
+
+    <div class="footer-social">
+      <a href="https://x.com/justice_note" target="_blank" rel="noopener" aria-label="PropSize on X">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      </a>
+    </div>
+  </div>
 </footer>
+
+</div><!-- .page-wrapper -->
+
+<!-- ═══════ MOTION ANIMATIONS ═══════ -->
+<script type="module">
+import { animate, inView, stagger } from "https://cdn.jsdelivr.net/npm/motion@latest/+esm";
+
+const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const ease = [0.25, 0.1, 0.25, 1];
+
+if (reducedMotion) {
+  document.querySelectorAll(".reveal").forEach(el => el.style.opacity = "1");
+} else {
+
+  // ── HERO — staggered children, reading order ──
+  // Headline arrives first
+  animate("#hero-headline",
+    { opacity: [0, 1], transform: ["translateY(28px)", "translateY(0)"] },
+    { duration: 0.6, delay: 0.1, easing: ease }
+  );
+  // Subline follows
+  animate("#hero-subline",
+    { opacity: [0, 1], transform: ["translateY(24px)", "translateY(0)"] },
+    { duration: 0.55, delay: 0.2, easing: ease }
+  );
+  // CTA button
+  animate("#hero-cta",
+    { opacity: [0, 1], transform: ["translateY(20px)", "translateY(0)"] },
+    { duration: 0.5, delay: 0.3, easing: ease }
+  );
+  // Caption
+  animate("#hero-caption",
+    { opacity: [0, 1], transform: ["translateY(12px)", "translateY(0)"] },
+    { duration: 0.4, delay: 0.38, easing: ease }
+  );
+  // Phone image — last, the visual payoff
+  animate("#hero-right",
+    { opacity: [0, 1], transform: ["translateY(36px)", "translateY(0)"] },
+    { duration: 0.7, delay: 0.35, easing: ease }
+  );
+
+  // ── HOW IT WORKS — phone + staggered steps ──
+  inView(".how-it-works", () => {
+    animate(".how-it-works .section-label",
+      { opacity: [0, 1], transform: ["translateY(16px)", "translateY(0)"] },
+      { duration: 0.4, easing: ease }
+    );
+    animate(".hiw-phone",
+      { opacity: [0, 1], transform: ["translateY(30px)", "translateY(0)"] },
+      { duration: 0.6, delay: 0.1, easing: ease }
+    );
+    animate(".hiw-step",
+      { opacity: [0, 1], transform: ["translateY(24px)", "translateY(0)"] },
+      { duration: 0.5, delay: stagger(0.15, { startDelay: 0.2 }), easing: ease }
+    );
+  }, { amount: 0.1 });
+
+  // ── TESTIMONIAL ──
+  inView(".testimonial", () => {
+    animate(".testimonial-card",
+      { opacity: [0, 1], transform: ["translateY(24px)", "translateY(0)"] },
+      { duration: 0.5, easing: ease }
+    );
+  }, { amount: 0.15 });
+
+  // ── FEATURES — label then staggered cards ──
+  inView(".features", () => {
+    animate(".features .section-label",
+      { opacity: [0, 1], transform: ["translateY(16px)", "translateY(0)"] },
+      { duration: 0.4, easing: ease }
+    );
+    animate(".feature-item",
+      { opacity: [0, 1], transform: ["translateY(24px)", "translateY(0)"] },
+      { duration: 0.45, delay: stagger(0.1, { startDelay: 0.15 }), easing: ease }
+    );
+  }, { amount: 0.1 });
+
+  // ── TRUST STRIP ──
+  inView(".trust-strip", () => {
+    animate(".trust-strip",
+      { opacity: [0, 1], transform: ["translateY(20px)", "translateY(0)"] },
+      { duration: 0.5, easing: ease }
+    );
+  }, { amount: 0.2 });
+
+  // ── FOUNDER ──
+  inView(".founder", () => {
+    animate(".founder-card",
+      { opacity: [0, 1], transform: ["translateY(24px)", "translateY(0)"] },
+      { duration: 0.5, easing: ease }
+    );
+  }, { amount: 0.15 });
+
+  // ── SHARE CARD ──
+  inView(".share-card-section", () => {
+    animate(".share-card-section .reveal",
+      { opacity: [0, 1], transform: ["translateY(24px)", "translateY(0)"] },
+      { duration: 0.5, delay: stagger(0.15), easing: ease }
+    );
+  }, { amount: 0.1 });
+
+  // ── PRICING PREVIEW ──
+  inView(".pricing-preview", () => {
+    animate(".pricing-preview-card",
+      { opacity: [0, 1], transform: ["translateY(24px)", "translateY(0)"] },
+      { duration: 0.5, easing: ease }
+    );
+  }, { amount: 0.15 });
+
+  // ── FAQ ──
+  inView(".faq", () => {
+    animate(".faq .reveal",
+      { opacity: [0, 1], transform: ["translateY(24px)", "translateY(0)"] },
+      { duration: 0.5, delay: stagger(0.15), easing: ease }
+    );
+  }, { amount: 0.1 });
+
+  // ── CLOSING CTA ──
+  inView(".closing-cta", () => {
+    animate(".closing-cta .reveal",
+      { opacity: [0, 1], transform: ["translateY(20px)", "translateY(0)"] },
+      { duration: 0.5, delay: stagger(0.12), easing: ease }
+    );
+  }, { amount: 0.2 });
+}
+
+// ── FAQ accordion (runs regardless of motion preference) ──
+document.querySelectorAll(".faq-question").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const item = btn.parentElement;
+    const isOpen = item.classList.contains("open");
+    // Close all
+    document.querySelectorAll(".faq-item.open").forEach(i => {
+      i.classList.remove("open");
+      i.querySelector(".faq-question").setAttribute("aria-expanded", "false");
+    });
+    // Open clicked (if it wasn't already open)
+    if (!isOpen) {
+      item.classList.add("open");
+      btn.setAttribute("aria-expanded", "true");
+    }
+  });
+});
+</script>
 
 </body>
 </html>
