@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  width: 1200px;
+  height: 630px;
+  background: #0A0A0A;
+  font-family: 'Poppins', sans-serif;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  padding: 0 80px;
+  position: relative;
+}
+
+.glow {
+  position: absolute;
+  right: 200px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(232,168,56,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.left {
+  flex: 1;
+  padding-right: 60px;
+}
+
+.headline {
+  font-size: 44px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  margin-bottom: 20px;
+}
+
+.headline em {
+  color: #E8A838;
+  font-style: normal;
+}
+
+.subline {
+  font-size: 18px;
+  color: rgba(255,255,255,0.55);
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.badge {
+  margin-top: 24px;
+  display: inline-block;
+  background: rgba(232,168,56,0.15);
+  border: 1px solid rgba(232,168,56,0.3);
+  color: #E8A838;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+.right {
+  flex-shrink: 0;
+  width: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.right img {
+  width: 260px;
+  height: auto;
+  border-radius: 24px;
+  filter: drop-shadow(0 0 40px rgba(232,168,56,0.1));
+}
+</style>
+</head>
+<body>
+  <div class="glow"></div>
+  <div class="left">
+    <div class="headline">One wrong lot size<br>ends a funded account.<br><em>This fixes that.</em></div>
+    <div class="subline">PropSize — prop firm position size calculator</div>
+    <div class="badge">FTMO · FundedNext · FundingPips</div>
+  </div>
+  <div class="right">
+    <img src="/images/propsize-screenshot.png" alt="">
+  </div>
+</body>
+</html>

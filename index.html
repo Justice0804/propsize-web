@@ -5,15 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PropSize — Prop Firm Position Size Calculator</title>
 <meta name="description" content="The only position size calculator that knows your prop firm's rules. FTMO, FundedNext, FundingPips — never blow a challenge on a sizing mistake.">
-<meta property="og:title" content="PropSize — Size every trade. Protect every account.">
-<meta property="og:description" content="The only position size calculator that knows your prop firm's rules. Never blow a challenge on a sizing mistake.">
-<meta property="og:image" content="https://propsize.app/hero.png">
+<meta property="og:title" content="One wrong lot size ends a funded account. This fixes that.">
+<meta property="og:description" content="PropSize — the only position size calculator with FTMO, FundedNext and FundingPips rules built in.">
+<meta property="og:image" content="https://propsize.app/assets/images/og-card.png">
 <meta property="og:url" content="https://propsize.app">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="PropSize — Size every trade. Protect every account.">
-<meta name="twitter:description" content="The only position size calculator that knows your prop firm's rules.">
-<meta name="twitter:image" content="https://propsize.app/hero.png">
+<meta name="twitter:title" content="One wrong lot size ends a funded account. This fixes that.">
+<meta name="twitter:description" content="PropSize — the only position size calculator with FTMO, FundedNext and FundingPips rules built in.">
+<meta name="twitter:image" content="https://propsize.app/assets/images/og-card.png">
 <link rel="canonical" href="https://propsize.app">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -275,20 +275,29 @@ section { padding: 80px 24px; }
   margin-top: 16px;
 }
 
-.app-store-badge {
-  display: inline-block;
+.badge-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
   margin-top: 32px;
+  flex-wrap: wrap;
+}
+
+.badge-row.centered { justify-content: center; margin-top: 0; }
+
+.app-store-badge, .play-store-badge {
+  display: inline-block;
   transition: opacity 0.2s, transform 0.15s;
   cursor: pointer;
 }
 
-.app-store-badge img {
+.app-store-badge img, .play-store-badge img {
   height: 44px;
   width: auto;
 }
 
-.app-store-badge:hover { opacity: 0.85; }
-.app-store-badge:active { transform: scale(0.97); }
+.app-store-badge:hover, .play-store-badge:hover { opacity: 0.85; }
+.app-store-badge:active, .play-store-badge:active { transform: scale(0.97); }
 
 .hero-caption {
   font-size: 12px;
@@ -318,8 +327,8 @@ section { padding: 80px 24px; }
   }
   .hero-left h1 { font-size: 36px; }
   .hero-left .subline { max-width: 100%; margin-left: auto; margin-right: auto; }
-  .app-store-badge { margin-left: auto; margin-right: auto; }
-  .app-store-badge img { height: 40px; }
+  .badge-row { justify-content: center; }
+  .app-store-badge img, .play-store-badge img { height: 40px; }
   .hero-caption { text-align: center; }
   .hero-right { justify-content: center; }
   .hero-right img { max-width: 280px; }
@@ -987,6 +996,17 @@ section { padding: 80px 24px; }
   ]
 }
 </script>
+<script>
+  !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.async=!0,p.src=s.api_host+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures getActiveMatchingSurveys getSurveys getNextSurveyStep onFeatureFlags onSessionId".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+  posthog.init('phc_zp3GjSHzhvrf4zzCokVGpGTQYx2Voi6Lm8dprLroieAL', {
+    api_host: 'https://eu.i.posthog.com',
+    person_profiles: 'anonymous',
+    capture_pageview: true,
+    capture_pageleave: true
+  });
+  var src = new URLSearchParams(window.location.search).get('src');
+  if (src) posthog.capture('landing_page_visit', { source: src });
+</script>
 </head>
 <body>
 
@@ -1014,7 +1034,7 @@ section { padding: 80px 24px; }
       <li><a href="#pricing">Pricing</a></li>
     </ul>
 
-    <a href="https://apps.apple.com/app/propsize/id6761734569" class="nav-cta">Download</a>
+    <a href="https://apps.apple.com/app/propsize-prop-firm-calculator/id6761734569" class="nav-cta">Download</a>
 
     <button class="hamburger" onclick="document.querySelector('.mobile-menu').classList.toggle('open')" aria-label="Toggle menu">
       <span></span><span></span><span></span>
@@ -1024,7 +1044,7 @@ section { padding: 80px 24px; }
 
 <div class="mobile-menu" role="navigation" aria-label="Mobile menu">
   <a href="#pricing" onclick="this.parentElement.classList.remove('open')">Pricing</a>
-  <a href="https://apps.apple.com/app/propsize/id6761734569" onclick="this.parentElement.classList.remove('open')">Download</a>
+  <a href="https://apps.apple.com/app/propsize-prop-firm-calculator/id6761734569" onclick="this.parentElement.classList.remove('open')">Download</a>
 </div>
 
 <!-- ═══════ HERO ═══════ -->
@@ -1036,9 +1056,14 @@ section { padding: 80px 24px; }
         <h1 class="reveal" id="hero-headline">Size every trade.<br>Protect every account.</h1>
         <p class="subline reveal" id="hero-subline">The only calculator built for prop traders. Knows your firm's rules. No ads, no manual setup, no scrolling — pre-filled and ready before your entry fires.</p>
 
-        <a href="https://apps.apple.com/app/propsize/id6761734569" class="app-store-badge reveal" id="hero-cta">
-          <img src="/assets/images/app-store-badge.svg" alt="Download on the App Store" height="44">
-        </a>
+        <div class="badge-row reveal" id="hero-cta">
+          <a href="https://apps.apple.com/app/propsize-prop-firm-calculator/id6761734569" class="app-store-badge">
+            <img src="/assets/images/app-store-badge.svg" alt="Download on the App Store" height="44">
+          </a>
+          <a href="/android" class="play-store-badge">
+            <img src="/assets/images/google-play-badge.png" alt="Get it on Google Play" height="44">
+          </a>
+        </div>
         <p class="hero-caption reveal" id="hero-caption">Free 7-day trial</p>
       </div>
 
@@ -1165,9 +1190,14 @@ section { padding: 80px 24px; }
         </div>
       </div>
 
-      <a href="https://apps.apple.com/app/propsize/id6761734569" class="app-store-badge" style="margin-top: 0">
-        <img src="/assets/images/app-store-badge.svg" alt="Download on the App Store" height="44">
-      </a>
+      <div class="badge-row centered">
+        <a href="https://apps.apple.com/app/propsize-prop-firm-calculator/id6761734569" class="app-store-badge">
+          <img src="/assets/images/app-store-badge.svg" alt="Download on the App Store" height="44">
+        </a>
+        <a href="/android" class="play-store-badge">
+          <img src="/assets/images/google-play-badge.png" alt="Get it on Google Play" height="44">
+        </a>
+      </div>
     </div>
   </div>
 </section>
@@ -1242,9 +1272,14 @@ section { padding: 80px 24px; }
   <div class="container" style="text-align: center;">
     <h2 class="reveal" style="font-family: var(--font-hero); font-size: 32px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 12px;">Start sizing trades the right way.</h2>
     <p class="reveal" style="color: var(--subtext); font-size: 15px; margin-bottom: 28px;">Free 7-day trial. Cancel anytime.</p>
-    <a href="https://apps.apple.com/app/propsize/id6761734569" class="app-store-badge reveal" style="margin-top: 0">
-      <img src="/assets/images/app-store-badge.svg" alt="Download on the App Store" height="44">
-    </a>
+    <div class="badge-row centered reveal">
+      <a href="https://apps.apple.com/app/propsize-prop-firm-calculator/id6761734569" class="app-store-badge">
+        <img src="/assets/images/app-store-badge.svg" alt="Download on the App Store" height="44">
+      </a>
+      <a href="/android" class="play-store-badge">
+        <img src="/assets/images/google-play-badge.png" alt="Get it on Google Play" height="44">
+      </a>
+    </div>
   </div>
 </section>
 
@@ -1441,6 +1476,22 @@ document.querySelectorAll(".faq-question").forEach(btn => {
       item.classList.add("open");
       btn.setAttribute("aria-expanded", "true");
     }
+  });
+});
+
+// ── Download click tracking ──
+document.querySelectorAll('a[href*="apps.apple.com"]').forEach(link => {
+  link.addEventListener("click", () => {
+    var loc = link.closest("nav") ? "nav" : link.closest(".hero") ? "hero" : link.closest(".pricing-preview") ? "pricing" : link.closest(".closing-cta") ? "closing-cta" : "other";
+    var src = new URLSearchParams(window.location.search).get("src") || "direct";
+    posthog.capture("app_store_click", { platform: "ios", location: loc, source: src });
+  });
+});
+document.querySelectorAll('a[href*="/android"]').forEach(link => {
+  link.addEventListener("click", () => {
+    var loc = link.closest(".hero") ? "hero" : link.closest(".pricing-preview") ? "pricing" : link.closest(".closing-cta") ? "closing-cta" : "other";
+    var src = new URLSearchParams(window.location.search).get("src") || "direct";
+    posthog.capture("android_interest_click", { location: loc, source: src });
   });
 });
 </script>
